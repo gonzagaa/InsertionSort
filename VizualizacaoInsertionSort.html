@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização do Insertion Sort</title>
+    <style>
+        body {
+            background: #d1d1d1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden;
+
+            justify-content: center;
+
+        }
+        h1 {
+            font-size: 25px;
+            line-height: 0;
+            margin-top: -50px;
+            margin-bottom: 30px;
+        }
+        #array {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px;
+        }
+        .box {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            color: white;
+            border-radius: 10px;
+            transition: all 1s ease-in-out;
+        }
+
+ 
+        .box.current {
+            border: 2px solid rgb(0, 255, 30);
+            transform: scale(1.2);
+        }
+
+        .box.highlighted {
+            border: 2px dashed rgb(89, 255, 0); /* Bordas para destacar operações anteriores */
+            transform: scale(1.2);
+        }
+
+        button {
+            margin-top: 30px;
+            border: none;
+            font-size: 25px;
+            padding: 10px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: linear-gradient(to right, #4bd310, #59f853);
+
+            transition: all 300ms ease-in-out;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        @media (min-width: 1080px) {
+            h1 {
+                font-size: 25px;
+            }
+
+            .box {
+            width: 60px;
+            height: 60px;
+            margin: 0 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            border-radius: 10px;
+            transition: all 1s ease-in-out;
+        }
+        }
+    </style>
+</head>
+<body>
+    <h1>Visualização do Insertion Sort</h1>
+    <div id="array"></div>
+    <button onclick="insertionSortStep()">Comparar</button>
+
+    <script>
+        const array = [5, 3, 1, 20, 8, 7, 2];
+        let currentIndex = 1; 
+
+        function getColor(value) {
+            const max = Math.max(...array);
+            const intensity = Math.floor((value / max) * 210); 
+            return `rgb(0, 0, ${intensity})`;
+        }
+
+        function displayArray() {
+            const container = document.getElementById('array');
+            container.innerHTML = ''; 
+            array.forEach((value, index) => {
+                const box = document.createElement('div');
+                box.className = 'box';
+                box.innerText = value;
+                box.style.backgroundColor = getColor(value); 
+
+                if (index === currentIndex) {
+                    box.classList.add('current'); 
+                }
+                if (index === currentIndex - 1) {
+                    box.classList.add('to-insert'); 
+                }
+                
+                container.appendChild(box);
+            });
+        }
+
+        async function insertionSortStep() {
+            if (currentIndex < array.length) {
+                let key = array[currentIndex];
+                let j = currentIndex - 1;
+
+
+                highlightInsertionKey(currentIndex);
+
+
+                while (j >= 0 && array[j] > key) {
+                    
+                    const temp = array[j + 1];
+                    array[j + 1] = array[j];
+                    array[j] = temp;
+
+                    displayArray(); 
+                    highlightPreviousOperation(j); 
+                    await sleep(500); 
+                    j--;
+                }
+                
+                array[j + 1] = key;
+
+                currentIndex++; 
+                displayArray(); 
+                await sleep(500); 
+            } else {
+                alert('Ordenação completa!');
+            }
+        }
+
+        function highlightInsertionKey(index) {
+            const boxes = document.querySelectorAll('.box');
+            boxes[index - 1].classList.add('to-insert');
+        }
+
+        function highlightPreviousOperation(index) {
+            const boxes = document.querySelectorAll('.box');
+            boxes[index].classList.add('highlighted');
+            setTimeout(() => {
+                boxes[index].classList.remove('highlighted');
+            }, 500); 
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        displayArray();
+    </script>
+</body>
+</html>
